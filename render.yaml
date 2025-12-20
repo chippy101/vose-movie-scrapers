@@ -60,9 +60,7 @@ services:
       pip install --upgrade pip
       pip install -r requirements.txt
       pip install -r api/requirements.txt
-    command: |
-      PYTHONPATH=. python scrapers/unified_scraper_db.py
-      PYTHONPATH=. python scrapers/fetch_movie_metadata.py
+    command: PYTHONPATH=. python scrapers/unified_scraper_db.py && PYTHONPATH=. python scrapers/fetch_movie_metadata.py
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.0

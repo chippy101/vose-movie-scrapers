@@ -8,7 +8,7 @@ selenium==4.38.0        # Browser automation
 playwright==1.55.0      # Alternative browser automation (optional)
 
 # ========== Utilities ==========
-requests==2.31.0        # HTTP client (fallback)
+requests==2.32.4        # HTTP client (fallback)
 
 # ========== Installation Instructions ==========
 # 1. Install Python dependencies:

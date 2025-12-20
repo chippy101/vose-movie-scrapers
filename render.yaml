@@ -13,14 +13,14 @@ services:
     runtime: python
     region: frankfurt  # EU region for Balearic Islands proximity
     plan: starter  # Free tier, upgrade to standard for production
-    branch: main
+    branch: master
     rootDir: vosemovies-backend
     buildCommand: |
       pip install --upgrade pip
       pip install -r requirements.txt
       pip install -r api/requirements.txt
     startCommand: |
-      cd api && uvicorn main:app --host 0.0.0.0 --port $PORT
+      PYTHONPATH=. uvicorn api.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.0
@@ -54,14 +54,15 @@ services:
     runtime: python
     region: frankfurt
     schedule: "0 */4 * * *"  # Every 4 hours
-    branch: main
+    branch: master
     rootDir: vosemovies-backend
     buildCommand: |
       pip install --upgrade pip
       pip install -r requirements.txt
       pip install -r api/requirements.txt
     command: |
-      cd scrapers && python run_all_scrapers.py
+      PYTHONPATH=. python scrapers/unified_scraper_db.py
+      PYTHONPATH=. python scrapers/fetch_movie_metadata.py
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.0

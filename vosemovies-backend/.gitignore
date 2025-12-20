@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+*.env
+personal access token*
+*token*
+.secrets
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Expo
+.expo/
+.expo-shared/
+node_modules/
+npm-debug.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+
+# Scraper outputs
+data/cinema/*.json
+data/cinema/*.html
+*.json
+*.html
+
+# Temporary files
+/tmp/
+*.log
+
+# Keep directory structure
+!data/cinema/.gitkeep
+!.gitkeep

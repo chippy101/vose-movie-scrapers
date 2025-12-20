@@ -1,0 +1,238 @@
+# ============================================================================
+# PopcornPal (VoseMovies) - Unified Monorepo .gitignore
+# ============================================================================
+
+# =============================================================================
+# Environment & Secrets
+# =============================================================================
+.env
+.env.local
+.env.*.local
+*.env
+.env.production
+.env.staging
+.env.development
+*token*
+personal access token*
+.secrets
+
+# =============================================================================
+# Python Backend
+# =============================================================================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# Testing
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+vose_movies.db
+
+# Scraper outputs
+data/cinema/*.json
+data/cinema/*.html
+*.json
+*.html
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# =============================================================================
+# React Native / Expo Frontend
+# =============================================================================
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Expo
+.expo/
+.expo-shared/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native builds
+/ios
+/android
+*.apk
+*.aab
+*.ipa
+
+# Keep generated android folder but ignore build outputs
+!vosemovies-frontend/android
+vosemovies-frontend/android/app/build/
+vosemovies-frontend/android/build/
+vosemovies-frontend/android/.gradle/
+vosemovies-frontend/android/.kotlin/
+
+# Metro
+.metro-health-check*
+
+# Native signing keys
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+*.keystore
+
+# Testing
+coverage/
+
+# Debug files
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# TypeScript
+*.tsbuildinfo
+
+# =============================================================================
+# IDE & Editors
+# =============================================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.iml
+
+# =============================================================================
+# Operating System
+# =============================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.directory
+
+# =============================================================================
+# Build & Temporary Files
+# =============================================================================
+/tmp/
+*.tmp
+*.temp
+*.cache
+
+# =============================================================================
+# Project-Specific
+# =============================================================================
+# Session notes (move to delete/ when archived)
+SESSION_*.md
+
+# Release docs are kept for reference
+# !release-docs/
+
+# Keep example files
+!.env.example
+!.env.*.example
+
+# Keep directory structure markers
+!.gitkeep
+!**/.gitkeep
+
+# =============================================================================
+# Git & Version Control
+# =============================================================================
+*.orig
+*.rej
+*.patch
+
+# =============================================================================
+# Documentation (keep most, ignore generated)
+# =============================================================================
+# Keep all markdown files except session notes
+!*.md
+SESSION_*.md
+
+# =============================================================================
+# Allowlist Patterns
+# =============================================================================
+# Explicitly include important config files
+!.gitignore
+!.prettierrc
+!.eslintrc.js
+!tsconfig.json
+!babel.config.js
+!metro.config.js
+!app.config.js
+!render.yaml
+
+# Include all Python and TypeScript source files
+!**/*.py
+!**/*.ts
+!**/*.tsx
+!**/*.js
+!**/*.jsx
+
+# Include all documentation
+!**/*.md
+!docs/**/*
+!release-docs/**/*
+
+# Include requirements and package files
+!requirements.txt
+!package.json
+!package-lock.json
+
+# Include shell scripts
+!**/*.sh
+
+# =============================================================================
+# Notes
+# =============================================================================
+# This .gitignore is comprehensive to cover both frontend and backend
+# Subdirectories (vosemovies-backend, vosemovies-frontend) may have additional
+# .gitignore files for directory-specific rules

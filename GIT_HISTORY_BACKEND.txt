@@ -1,0 +1,10 @@
+00d13d6 Add automatic director and cast_members collection to TMDB metadata fetch
+8c32671 feat: Add expanded cinema coverage and testing framework
+4c1d60a feat: Add English-only filtering for VOSE movies
+c43cfd3 refactor: Reorganize project structure into popcornpal parent directory
+82544fc Add session notes for project continuity
+1892a97 Remove api/.env from version control
+44d1ee8 Update .gitignore and environment templates for security
+9f9f74c Add TMDB integration for movie metadata
+a6ff5f0 Add frontend changes documentation
+d16e7a1 Phase 1 Complete: Backend API + Stealth Scrapers

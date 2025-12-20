@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "Popcorn Pal",
+    "slug": "popcornpal",
+    "version": "0.1.0",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1a1d3a"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.popcornpal.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Popcorn Pal needs your location to show nearby cinemas and sort them by distance.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Popcorn Pal needs your location to show nearby cinemas and sort them by distance."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1a1d3a"
+      },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ],
+      "usesCleartextTraffic": true,
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "package": "com.popcornpal.app",
+      "versionCode": 1
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id-will-be-added-by-eas"
+      }
+    }
+  }
+}

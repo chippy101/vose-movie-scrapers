@@ -1,0 +1,64 @@
+MIT License
+
+Copyright (c) 2025 VoseMovies
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+THIRD-PARTY LICENSES AND ATTRIBUTIONS
+
+This software uses third-party libraries and services:
+
+1. The Movie Database (TMDB) API
+   - Movie metadata provided by TMDB
+   - License: TMDB API Terms of Use
+   - Attribution: "This product uses the TMDB API but is not endorsed or certified by TMDB."
+   - Website: https://www.themoviedb.org/
+
+2. React Native & Expo
+   - License: MIT
+   - Copyright (c) Meta Platforms, Inc. and affiliates
+
+3. FastAPI
+   - License: MIT
+   - Copyright (c) Sebastián Ramírez
+
+4. Selenium
+   - License: Apache License 2.0
+   - Copyright (c) Software Freedom Conservancy
+
+5. BeautifulSoup4
+   - License: MIT
+   - Copyright (c) Leonard Richardson
+
+Full licenses for dependencies can be found in:
+- Frontend: vosemovies-frontend/package.json
+- Backend: vosemovies-backend/requirements.txt
+
+---
+
+DATA SOURCES
+
+Cinema showtime data is aggregated from publicly available sources:
+- CineCiutat (https://cineciutat.org)
+- Aficine (https://aficine.com)
+
+This application respects robots.txt directives and implements polite scraping practices.
+Cinema names, logos, and branding remain the property of their respective owners.

@@ -1,0 +1,111 @@
+# ============================================================================
+# Render.com Deployment Configuration for PopcornPal (VoseMovies)
+# ============================================================================
+# This file defines the infrastructure for deploying PopcornPal to Render
+# Documentation: https://render.com/docs/infrastructure-as-code
+
+services:
+  # ==========================================================================
+  # Backend API Service (Python FastAPI)
+  # ==========================================================================
+  - type: web
+    name: popcornpal-api
+    runtime: python
+    region: frankfurt  # EU region for Balearic Islands proximity
+    plan: starter  # Free tier, upgrade to standard for production
+    branch: main
+    rootDir: vosemovies-backend
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      pip install -r api/requirements.txt
+    startCommand: |
+      cd api && uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: ENVIRONMENT
+        value: production
+      - key: API_HOST
+        value: 0.0.0.0
+      - key: API_PORT
+        sync: false
+        value: $PORT  # Render provides this automatically
+      - key: DATABASE_URL
+        fromDatabase:
+          name: popcornpal-db
+          property: connectionString
+      - key: TMDB_API_KEY
+        sync: false  # Set manually in Render dashboard (secret)
+      - key: CORS_ORIGINS
+        sync: false  # Set manually: https://popcornpal.app,https://www.popcornpal.app
+      - key: SCRAPER_HEADLESS
+        value: True
+      - key: SCRAPER_INTERVAL_HOURS
+        value: 4
+    healthCheckPath: /health
+    autoDeploy: true
+
+  # ==========================================================================
+  # Scraper Cron Job (runs every 4 hours)
+  # ==========================================================================
+  - type: cron
+    name: popcornpal-scrapers
+    runtime: python
+    region: frankfurt
+    schedule: "0 */4 * * *"  # Every 4 hours
+    branch: main
+    rootDir: vosemovies-backend
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      pip install -r api/requirements.txt
+    command: |
+      cd scrapers && python run_all_scrapers.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: popcornpal-db
+          property: connectionString
+      - key: TMDB_API_KEY
+        sync: false  # Reuse from main service
+      - key: SCRAPER_HEADLESS
+        value: True
+    autoDeploy: true
+
+# ============================================================================
+# Database (PostgreSQL)
+# ============================================================================
+databases:
+  - name: popcornpal-db
+    databaseName: popcornpal
+    user: popcornpal
+    region: frankfurt
+    plan: starter  # Free tier, 90 days then $7/mo
+    ipAllowList: []  # Empty = allow from Render services only
+
+# ============================================================================
+# Post-Deployment Notes
+# ============================================================================
+# After deploying:
+# 1. Set TMDB_API_KEY in Render dashboard (Environment > popcornpal-api)
+# 2. Set CORS_ORIGINS to your frontend domain
+# 3. Run initial scraper manually via Render dashboard (Cron Jobs > popcornpal-scrapers > Trigger)
+# 4. Database tables will be created automatically on first API start
+# 5. Monitor logs in Render dashboard
+#
+# Frontend Configuration:
+# Update vosemovies-frontend/.env:
+#   EXPO_PUBLIC_BACKEND_URL=https://popcornpal-api.onrender.com
+#
+# Database Connection String Format (auto-provided by Render):
+#   postgresql://user:password@hostname:5432/database
+#
+# Render will automatically:
+# - Install ChromeDriver for Selenium scrapers
+# - Configure SSL/HTTPS
+# - Provide health check monitoring
+# - Auto-restart on failures
+# - Deploy on git push to main branch

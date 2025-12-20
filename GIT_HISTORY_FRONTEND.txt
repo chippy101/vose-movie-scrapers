@@ -1,0 +1,2 @@
+d665ae7 Combine overview and cast/crew into compact unified section
+04041b9 feat: Implement direct YouTube trailer links in MovieDetailScreen

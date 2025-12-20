@@ -1,0 +1,33 @@
+# VOSE Movies Scrapers - Requirements
+# Scrapes VOSE (Original Version with Spanish Subtitles) movie showtimes
+# from Balearic Islands cinemas
+
+# ========== Web Scraping ==========
+beautifulsoup4==4.14.2  # HTML parsing
+selenium==4.38.0        # Browser automation
+playwright==1.55.0      # Alternative browser automation (optional)
+
+# ========== Utilities ==========
+requests==2.31.0        # HTTP client (fallback)
+
+# ========== Installation Instructions ==========
+# 1. Install Python dependencies:
+#    pip install -r requirements.txt
+#
+# 2. Install ChromeDriver (required for Selenium):
+#
+#    Ubuntu/Debian:
+#      sudo apt-get update
+#      sudo apt-get install chromium-chromedriver
+#
+#    macOS:
+#      brew install chromedriver
+#
+#    Verify:
+#      chromedriver --version
+#
+# 3. Optional: Install Playwright browsers:
+#    playwright install chromium
+#
+# ========== Python Version ==========
+# Python 3.8+ recommended

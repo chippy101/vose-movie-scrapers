@@ -8,10 +8,9 @@
 import Constants from 'expo-constants';
 
 // PRODUCTION CONFIGURATION - Change these values before building APK
-// EMULATOR: Use 10.0.2.2:8000
-// PHYSICAL DEVICE: Use 192.168.50.138:8000
+// This is the fallback when .env variables aren't available in production builds
 const PRODUCTION_CONFIG = {
-  BACKEND_URL: 'http://192.168.50.138:8000',  // PHYSICAL DEVICE VERSION
+  BACKEND_URL: 'https://vose-movie-scrapers.onrender.com',  // PRODUCTION RENDER API
   TMDB_API_KEY: '0cd89e13a33c9f826727e1e8484fcb2b',
 };
 

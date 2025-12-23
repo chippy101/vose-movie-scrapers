@@ -29,9 +29,7 @@ services:
       - key: API_HOST
         value: 0.0.0.0
       - key: DATABASE_URL
-        fromDatabase:
-          name: popcornpal-db
-          property: connectionString
+        sync: false  # Set manually in Render dashboard (Supabase connection string)
       - key: TMDB_API_KEY
         sync: false  # Set manually in Render dashboard (secret)
       - key: CORS_ORIGINS
@@ -62,9 +60,7 @@ services:
       - key: PYTHON_VERSION
         value: 3.10.0
       - key: DATABASE_URL
-        fromDatabase:
-          name: popcornpal-db
-          property: connectionString
+        sync: false  # Set manually in Render dashboard (Supabase connection string)
       - key: TMDB_API_KEY
         sync: false  # Reuse from main service
       - key: SCRAPER_HEADLESS
@@ -72,36 +68,36 @@ services:
     autoDeploy: true
 
 # ============================================================================
-# Database (PostgreSQL)
-# ============================================================================
-databases:
-  - name: popcornpal-db
-    databaseName: popcornpal
-    user: popcornpal
-    region: frankfurt
-    plan: starter  # Free tier, 90 days then $7/mo
-    ipAllowList: []  # Empty = allow from Render services only
-
-# ============================================================================
-# Post-Deployment Notes
+# Post-Deployment Notes - Supabase Database
 # ============================================================================
 # After deploying:
-# 1. Set TMDB_API_KEY in Render dashboard (Environment > popcornpal-api)
-# 2. Set CORS_ORIGINS to your frontend domain
-# 3. Run initial scraper manually via Render dashboard (Cron Jobs > popcornpal-scrapers > Trigger)
-# 4. Database tables will be created automatically on first API start
-# 5. Monitor logs in Render dashboard
+# 1. Create Supabase project at https://supabase.com
+# 2. Get connection string from: Project Settings (gear icon) → Database → Connection String
+#    → Select "URI" tab → Choose "Session pooler" mode → Copy and replace YOUR_PASSWORD
+# 3. Set DATABASE_URL in Render dashboard for BOTH services:
+#    - Environment > popcornpal-api > DATABASE_URL
+#    - Environment > popcornpal-scrapers > DATABASE_URL
+#    Format: postgresql://postgres.[ref]:[password]@aws-0-eu-central-1.pooler.supabase.com:5432/postgres
+# 4. Set TMDB_API_KEY in Render dashboard (Environment > popcornpal-api)
+# 5. Set CORS_ORIGINS to your frontend domain
+# 6. Run initial scraper manually via Render dashboard (Cron Jobs > popcornpal-scrapers > Trigger)
+# 7. Database tables will be created automatically on first API start
+# 8. Monitor logs in Render dashboard
+# 9. View/manage database in Supabase Studio: https://supabase.com/dashboard
 #
 # Frontend Configuration:
 # Update vosemovies-frontend/.env:
 #   EXPO_PUBLIC_BACKEND_URL=https://popcornpal-api.onrender.com
 #
-# Database Connection String Format (auto-provided by Render):
-#   postgresql://user:password@hostname:5432/database
+# Supabase Benefits:
+# - Unlimited free tier (500MB database, 5GB bandwidth/month)
+# - Automatic backups (7-day point-in-time recovery)
+# - Built-in database UI (Supabase Studio)
+# - Real-time subscriptions capability (optional future feature)
 #
 # Render will automatically:
 # - Install ChromeDriver for Selenium scrapers
 # - Configure SSL/HTTPS
 # - Provide health check monitoring
 # - Auto-restart on failures
-# - Deploy on git push to main branch
+# - Deploy on git push to master branch

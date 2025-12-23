@@ -418,10 +418,277 @@ eas build --platform android --profile preview
 ### Production: PostgreSQL (Recommended)
 
 **Providers:**
+- **Supabase: FREE (500MB database, 5GB bandwidth/month) - RECOMMENDED** ⭐
 - Railway: Included in platform
 - DigitalOcean Managed Database: $7/month
 - AWS RDS: ~$15/month (db.t3.micro)
-- Supabase: Free tier available
+
+### Supabase Setup (Current Production Setup)
+
+Supabase provides a generous free tier with PostgreSQL hosting, automatic backups, and a built-in database UI (Supabase Studio).
+
+#### Step-by-Step Setup:
+
+1. **Create Supabase Account**
+   - Go to: https://supabase.com
+   - Sign up with GitHub or email
+   - It's completely free (no credit card required)
+
+2. **Create New Project**
+   ```
+   Dashboard → New Project
+
+   Project name: popcornpal or vosemovies
+   Database password: Generate strong password (SAVE THIS SECURELY!)
+   Region: Europe West (Frankfurt or London) - closest to Balearic Islands
+   ```
+
+   Wait ~2 minutes for project creation
+
+3. **Get Database Connection String**
+
+   In Supabase Dashboard, go to:
+   ```
+   Project Dashboard → Project Settings (gear icon in left sidebar)
+   → Database (in left menu under "Configuration")
+   → Connection String section
+   ```
+
+   You'll see multiple connection string options. Select **"URI"** tab, then:
+   - Choose **"Session pooler"** mode (Port 5432) - RECOMMENDED for SQLAlchemy
+   - Copy the connection string shown
+
+   **Format (Session Mode - recommended):**
+   ```
+   postgresql://postgres.PROJECT_REF:YOUR_PASSWORD@aws-0-REGION.pooler.supabase.com:5432/postgres
+   ```
+
+   **IMPORTANT:** Replace `YOUR_PASSWORD` with the actual database password you set during project creation!
+
+   **Connection Info (if building manually):**
+   - Host: `aws-0-REGION.pooler.supabase.com` (e.g., aws-0-eu-central-1)
+   - Database: `postgres`
+   - User: `postgres.PROJECT_REF`
+   - Port: `5432` (Session Mode) or `6543` (Transaction Mode)
+   - Password: Your project database password
+
+   **Use Session Mode (Port 5432)** for better compatibility with SQLAlchemy
+
+4. **Disable Row Level Security (RLS)**
+
+   Supabase enables RLS by default for security. Since our backend handles all access control, disable it:
+
+   ```
+   Dashboard → Authentication → Policies
+
+   For each table that will be created (movies, cinemas, showtimes, scraper_runs):
+   - Ensure RLS is DISABLED
+   - This allows your backend to have full database access
+   ```
+
+   Note: Tables don't exist yet - they'll be created automatically when backend first starts
+
+5. **Set Environment Variables in Render**
+
+   Go to Render Dashboard and set `DATABASE_URL` for BOTH services:
+
+   **Backend API Service:**
+   ```
+   Render Dashboard → popcornpal-api → Environment
+
+   Add variable:
+   Key: DATABASE_URL
+   Value: postgresql://postgres.[ref]:[password]@...com:5432/postgres
+   ```
+
+   **Scraper Cron Job:**
+   ```
+   Render Dashboard → popcornpal-scrapers → Environment
+
+   Add variable:
+   Key: DATABASE_URL
+   Value: (same as above)
+   ```
+
+6. **Deploy and Initialize**
+
+   After setting `DATABASE_URL`, deploy your app:
+   - Render will auto-deploy on next git push
+   - Or manually trigger deployment in Render dashboard
+
+   On first startup, the backend will:
+   - Connect to Supabase PostgreSQL
+   - Automatically create all tables (movies, cinemas, showtimes, scraper_runs)
+   - Run migrations via Alembic
+
+   **Verify in Render logs:**
+   ```
+   "Database initialized"
+   "Connected to PostgreSQL"
+   ```
+
+7. **Verify Database Setup**
+
+   **Supabase Studio:**
+   ```
+   Dashboard → Table Editor
+
+   You should see tables:
+   - movies
+   - cinemas
+   - showtimes
+   - scraper_runs
+   - alembic_version
+   ```
+
+   **SQL Editor (optional check):**
+   ```sql
+   SELECT tablename FROM pg_tables WHERE schemaname = 'public';
+   ```
+
+8. **Run Initial Scraper**
+
+   Populate your database with cinema data:
+   ```
+   Render Dashboard → popcornpal-scrapers (Cron Job) → Trigger Run
+   ```
+
+   Wait 2-5 minutes, then check Supabase Studio:
+   - Movies table should have ~50-100 entries
+   - Cinemas table should have ~10 entries
+   - Showtimes table should have ~500 entries
+
+9. **Monitor Database Usage**
+
+   **Free Tier Limits:**
+   - Database size: 500MB (current usage: ~500KB = 0.1%)
+   - Bandwidth: 5GB/month
+   - API requests: Unlimited
+   - Connections: Up to 60 concurrent
+
+   **Check usage:**
+   ```
+   Dashboard → Reports → Database → Database Size
+   ```
+
+#### Supabase Studio Features
+
+Access your database UI at: `https://supabase.com/dashboard/project/[your-project-ref]`
+
+**Table Editor:**
+- View, edit, and filter data directly
+- No SQL knowledge needed
+- Real-time data updates
+
+**SQL Editor:**
+- Run custom queries
+- Save frequently used queries
+- View query execution plans
+
+**Database:**
+- View schema and relationships
+- Inspect indexes
+- Monitor query performance
+
+**Logs:**
+- Database queries in real-time
+- Slow query monitoring
+- Connection tracking
+
+#### Future: Real-Time Subscriptions (Optional)
+
+Supabase supports real-time data subscriptions via WebSockets. Future enhancement for live showtime updates:
+
+1. **Enable Replication:**
+   ```
+   Dashboard → Database → Replication
+   Enable for: showtimes table
+   ```
+
+2. **Frontend Integration:**
+   ```bash
+   cd vosemovies-frontend
+   npm install @supabase/supabase-js
+   ```
+
+   ```typescript
+   // src/services/supabase.ts
+   import { createClient } from '@supabase/supabase-js'
+
+   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+   // Subscribe to new showtimes
+   supabase
+     .channel('showtimes')
+     .on('postgres_changes',
+       { event: 'INSERT', schema: 'public', table: 'showtimes' },
+       (payload) => {
+         console.log('New showtime:', payload.new)
+         // Update UI in real-time
+       }
+     )
+     .subscribe()
+   ```
+
+**Benefits:**
+- Users see new showtimes immediately
+- No need to refresh manually
+- Reduced API polling
+
+#### Backup and Recovery
+
+Supabase free tier includes:
+- **Automatic backups:** Daily snapshots (7-day retention)
+- **Point-in-time recovery:** Restore to any point in last 7 days
+- **Manual backups:** Export via SQL dump
+
+**Manual backup:**
+```bash
+# From Supabase Studio → SQL Editor:
+pg_dump --no-owner --no-acl -h [host] -U postgres.[ref] -d postgres > backup.sql
+```
+
+#### Troubleshooting
+
+**Connection refused:**
+- Check that DATABASE_URL is set correctly in Render
+- Verify Supabase project is active (not paused)
+- Ensure using Session Mode (port 5432), not Transaction Mode
+
+**Tables not created:**
+- Check Render backend logs for errors
+- Manually run migrations: `alembic upgrade head`
+- Verify SQLAlchemy models are being imported
+
+**Slow queries:**
+- Check Supabase Studio → Logs for slow queries
+- Add indexes if needed (already optimized in models)
+- Consider upgrading to paid tier for more connections
+
+**Database full:**
+- Check usage in Dashboard → Reports
+- Clean old showtimes: Run `mark_old_showtimes_inactive()` periodically
+- Upgrade to paid tier if needed ($25/month = 8GB)
+
+#### Migration from Render PostgreSQL
+
+If migrating from existing Render database:
+
+1. **Export from Render:**
+   ```bash
+   # Get Render DATABASE_URL from dashboard
+   pg_dump -h [render-host] -U [user] -d [database] > render_backup.sql
+   ```
+
+2. **Import to Supabase:**
+   ```bash
+   # Get Supabase connection details
+   psql "postgresql://postgres.[ref]:[password]@...com:5432/postgres" < render_backup.sql
+   ```
+
+3. **Update Render environment variables:**
+   - Replace old Render DATABASE_URL with Supabase connection string
+   - Deploy updated services
 
 **Migration from SQLite:**
 ```bash
@@ -606,17 +873,27 @@ If deployment fails:
 
 ## Cost Estimate
 
-### Minimal Setup (~$12/month)
-- Railway (backend + PostgreSQL): $10
-- Domain name: $12/year ($1/month)
-- SSL: Free (Let's Encrypt)
+### Free Setup (Current - $0/month!) ⭐
+- Render backend (starter plan): FREE
+- Supabase PostgreSQL: FREE (500MB, 5GB bandwidth)
+- SSL: Free (automatic)
+- Domain name: $12/year ($1/month) - optional
+- **Total: $0-1/month**
 
-### Recommended Setup (~$32/month)
-- Railway backend: $20
-- DigitalOcean PostgreSQL: $7
+### Minimal Paid Setup (~$7/month)
+- Render backend (starter plan after free period): $7
+- Supabase: FREE
+- Domain: $1/month
+- SSL: Free
+- **Total: $8/month**
+
+### Recommended Setup (~$27/month)
+- Render backend (standard plan): $20
+- Supabase: FREE
 - Domain: $1/month
 - Monitoring (Better Uptime): $10
 - Google Play Developer: $25 one-time
+- **Total: $31/month + $25 one-time**
 
 ### Enterprise Setup (~$100/month)
 - AWS EC2: $20

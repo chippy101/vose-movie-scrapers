@@ -3,7 +3,7 @@
 ## Project Overview
 - **Name**: PopcornPal (VoseMovies) – React Native app for finding VOSE movie showtimes in the Balearic Islands
 - **Purpose**: Help English speakers find movies in original language with Spanish subtitles across Mallorca, Menorca, and Ibiza
-- **Tech Stack**: React Native (Expo) + Python FastAPI + PostgreSQL + Selenium scrapers + TMDB API
+- **Tech Stack**: React Native (Expo) + Python FastAPI + Supabase PostgreSQL + Selenium scrapers + TMDB API
 - **Current Phase**: Production deployment to Render and multi-device testing
 - **Repository**: https://github.com/chippy101/vose-movie-scrapers.git (unified monorepo)
 
@@ -85,7 +85,12 @@ cd android && ./gradlew :app:createBundleReleaseJsAndAssets :app:assembleRelease
 
 ### Database Configuration
 **Development**: `DATABASE_URL=sqlite:///./vose_movies.db` (automatic)
-**Production**: Render auto-provides PostgreSQL connection string
+**Production**: Supabase PostgreSQL (FREE tier)
+- Connection string format: `postgresql://postgres.[ref]:[password]@aws-0-eu-central-1.pooler.supabase.com:5432/postgres`
+- Get from: Supabase Dashboard → Settings → Database (Session Mode)
+- Set manually in Render dashboard for both services (api + scrapers)
+- Features: 500MB database, 5GB bandwidth/month, automatic backups, Supabase Studio UI
+- Documentation: See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md#supabase-setup-current-production-setup)
 
 ## API Endpoints
 - `/health` - Health check
@@ -109,11 +114,14 @@ cd android && ./gradlew :app:createBundleReleaseJsAndAssets :app:assembleRelease
 - Test on both emulator and physical devices
 
 ### Important Notes
+- **Database**: Supabase PostgreSQL (FREE tier) - 500MB database, unlimited API requests, automatic backups
+- **Supabase Studio**: Built-in UI for database management at https://supabase.com/dashboard
 - **CORS**: Auto-configured for dev (localhost origins) - must set `CORS_ORIGINS` for production
 - **Scrapers**: Run every 4 hours via Render cron job
 - **Offline Support**: App uses 6hr fresh / 24hr stale caching
 - **TMDB Attribution**: Display "Data provided by TMDB" per API terms
 - **Maps**: MapLibre with OpenFreeMap (no API key needed)
+- **Future Feature**: Supabase real-time subscriptions for live showtime updates (optional)
 
 ## Current Phase: Production Deployment & Testing
 
@@ -123,12 +131,16 @@ cd android && ./gradlew :app:createBundleReleaseJsAndAssets :app:assembleRelease
 - Offline caching with stale-while-revalidate
 - Android builds working on emulator and physical devices
 - Error handling and connection diagnostics
+- Migration to Supabase PostgreSQL (FREE tier)
+- Render.com deployment configuration updated
 
 ### 🚀 Active Tasks
 1. **Backend Deployment**
-   - Deploy to cloud (Railway, DigitalOcean)
-   - Set up automated scraper cron jobs
-   - Switch to PostgreSQL
+   - ✅ Configured Render.com deployment
+   - ✅ Migrated to Supabase PostgreSQL
+   - 🔄 Set DATABASE_URL in Render dashboard (manual step)
+   - 🔄 Deploy and verify Supabase connection
+   - 🔄 Run initial scraper to populate database
    - Restrict CORS to frontend domain
 
 2. **Play Store Release**

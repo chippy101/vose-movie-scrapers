@@ -38,6 +38,7 @@ async def run_scraper_task():
 
 
 @router.post("/run")
+@router.get("/run")  # Also support GET for free monitoring services
 async def trigger_scraper(background_tasks: BackgroundTasks, request: Request):
     """
     Trigger the unified scraper to update showtime data
@@ -47,6 +48,8 @@ async def trigger_scraper(background_tasks: BackgroundTasks, request: Request):
 
     **Security**: In production, you should add authentication or IP whitelisting
     to prevent unauthorized scraping triggers.
+
+    Supports both GET and POST methods for compatibility with free-tier monitoring services.
     """
     client_ip = request.client.host if request.client else "unknown"
     logger.info(f"Scraper triggered by {client_ip}")
@@ -55,7 +58,7 @@ async def trigger_scraper(background_tasks: BackgroundTasks, request: Request):
     background_tasks.add_task(run_scraper_task)
 
     return JSONResponse(
-        status_code=202,  # Accepted - task queued
+        status_code=200,  # OK - compatible with free monitoring services
         content={
             "status": "accepted",
             "message": "Scraper task queued and will run in background",

@@ -42,30 +42,16 @@ services:
     autoDeploy: true
 
   # ==========================================================================
-  # Scraper Cron Job (runs every 4 hours)
+  # Scraper Service - REPLACED BY UPTIMEROBOT
   # ==========================================================================
-  - type: cron
-    name: popcornpal-scrapers
-    runtime: python
-    region: frankfurt
-    schedule: "0 */4 * * *"  # Every 4 hours
-    branch: master
-    rootDir: vosemovies-backend
-    buildCommand: |
-      pip install --upgrade pip
-      pip install -r requirements.txt
-      pip install -r api/requirements.txt
-    startCommand: PYTHONPATH=. python scrapers/unified_scraper_db.py && PYTHONPATH=. python scrapers/fetch_movie_metadata.py
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.10.0
-      - key: DATABASE_URL
-        sync: false  # Set manually in Render dashboard (Supabase connection string)
-      - key: TMDB_API_KEY
-        sync: false  # Reuse from main service
-      - key: SCRAPER_HEADLESS
-        value: True
-    autoDeploy: true
+  # Note: Cron jobs require paid plan on Render free tier
+  # Instead, we use UptimeRobot (free) to trigger /scraper/run endpoint
+  # Configuration:
+  #   - Monitor 1: https://vose-movie-scrapers.onrender.com/health (every 5 min)
+  #              Keeps service warm, prevents cold starts
+  #   - Monitor 2: https://vose-movie-scrapers.onrender.com/scraper/run (every 60 min)
+  #              Triggers scraper to update showtime data
+  # See: https://uptimerobot.com
 
 # ============================================================================
 # Post-Deployment Notes - Supabase Database
@@ -74,16 +60,19 @@ services:
 # 1. Create Supabase project at https://supabase.com
 # 2. Get connection string from: Project Settings (gear icon) → Database → Connection String
 #    → Select "URI" tab → Choose "Session pooler" mode → Copy and replace YOUR_PASSWORD
-# 3. Set DATABASE_URL in Render dashboard for BOTH services:
+# 3. Set DATABASE_URL in Render dashboard:
 #    - Environment > popcornpal-api > DATABASE_URL
-#    - Environment > popcornpal-scrapers > DATABASE_URL
-#    Format: postgresql://postgres.[ref]:[password]@aws-0-eu-central-1.pooler.supabase.com:5432/postgres
+#    Format: postgresql://postgres.[ref]:[password]@aws-1-eu-west-2.pooler.supabase.com:5432/postgres
 # 4. Set TMDB_API_KEY in Render dashboard (Environment > popcornpal-api)
-# 5. Set CORS_ORIGINS to your frontend domain
-# 6. Run initial scraper manually via Render dashboard (Cron Jobs > popcornpal-scrapers > Trigger)
-# 7. Database tables will be created automatically on first API start
-# 8. Monitor logs in Render dashboard
-# 9. View/manage database in Supabase Studio: https://supabase.com/dashboard
+# 5. Set CORS_ORIGINS to your frontend domain (or * for testing)
+# 6. Database tables will be created automatically on first API start
+# 7. Set up UptimeRobot monitors (free):
+#    - Monitor 1: /health every 5 min (keeps service warm)
+#    - Monitor 2: /scraper/run every 60 min (updates data)
+# 8. Trigger first scraper run manually:
+#    curl -X POST https://vose-movie-scrapers.onrender.com/scraper/run
+# 9. Monitor logs in Render dashboard
+# 10. View/manage database in Supabase Studio: https://supabase.com/dashboard
 #
 # Frontend Configuration:
 # Update vosemovies-frontend/.env:

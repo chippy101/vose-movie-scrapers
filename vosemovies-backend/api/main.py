@@ -16,7 +16,7 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
 from api.database.config import init_db
-from api.routers import movies, cinemas, showtimes
+from api.routers import movies, cinemas, showtimes, scraper
 from api.exceptions import register_exception_handlers
 
 load_dotenv()
@@ -198,6 +198,7 @@ register_exception_handlers(app)
 app.include_router(showtimes.router)
 app.include_router(movies.router)
 app.include_router(cinemas.router)
+app.include_router(scraper.router)
 
 
 @app.get("/")

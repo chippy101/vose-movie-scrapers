@@ -8,6 +8,7 @@ from datetime import datetime
 import logging
 import sys
 import os
+import asyncio
 
 # Add scrapers directory to path
 scrapers_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "scrapers")
@@ -16,25 +17,63 @@ sys.path.insert(0, scrapers_path)
 router = APIRouter(prefix="/scraper", tags=["scraper"])
 logger = logging.getLogger(__name__)
 
+# Maximum scraper runtime (30 minutes)
+SCRAPER_TIMEOUT = 1800
+
 
 async def run_scraper_task():
-    """Background task to run the unified scraper"""
+    """
+    Background task to run the unified scraper with timeout protection
+
+    Runs scraper in an async subprocess with a 30-minute timeout to prevent
+    indefinite blocking if Chrome crashes or hangs. The subprocess runs independently,
+    allowing the API to continue serving requests.
+    """
     try:
-        logger.info("Starting scraper background task...")
+        logger.info("Starting scraper background task with timeout protection...")
 
-        # Import scraper here to avoid import issues
-        from unified_scraper_db import UnifiedVOSEScraperDB
+        # Get the path to the scraper script
+        scraper_script = os.path.join(scrapers_path, "unified_scraper_db.py")
 
-        # Run scraper in headless mode
-        scraper = UnifiedVOSEScraperDB(headless=True)
-        results = scraper.scrape_all()
+        # Set environment for subprocess
+        env = os.environ.copy()
+        env['PYTHONPATH'] = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
-        logger.info(f"Scraper completed successfully. Results: {results}")
-        return results
+        # Run scraper in async subprocess (non-blocking)
+        process = await asyncio.create_subprocess_exec(
+            sys.executable, scraper_script,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            env=env
+        )
+
+        try:
+            # Wait for completion with timeout (non-blocking)
+            stdout, stderr = await asyncio.wait_for(
+                process.communicate(),
+                timeout=SCRAPER_TIMEOUT
+            )
+
+            if process.returncode == 0:
+                logger.info("Scraper completed successfully")
+                return {"status": "success"}
+            else:
+                logger.error(f"Scraper failed with exit code {process.returncode}")
+                logger.error(f"Stderr: {stderr.decode()[:500]}")  # Log first 500 chars
+                return {"status": "error"}
+
+        except asyncio.TimeoutError:
+            logger.warning(f"Scraper exceeded timeout of {SCRAPER_TIMEOUT}s, killing process...")
+            try:
+                process.kill()
+                await process.wait()
+            except:
+                pass
+            return {"status": "timeout"}
 
     except Exception as e:
         logger.error(f"Scraper task failed: {e}", exc_info=True)
-        raise
+        return {"status": "error"}
 
 
 @router.post("/run")

@@ -76,7 +76,7 @@ cd android && ./gradlew :app:createBundleReleaseJsAndAssets :app:assembleRelease
 **Location**: `vosemovies-frontend/.env`
 - **Emulator**: `http://10.0.2.2:8000` (Android special alias)
 - **Physical Device (local)**: `http://192.168.x.x:8000` (your network IP)
-- **Production**: `https://popcornpal-api.onrender.com` (or your Render URL)
+- **Production**: `https://vose-movie-scrapers.onrender.com`
 
 ### TMDB API Key
 **Required in both**:

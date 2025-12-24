@@ -221,6 +221,7 @@ def root(request: Request):
 
 
 @app.get("/health")
+@app.head("/health")  # Support HEAD for UptimeRobot monitoring
 @limiter.limit("200/minute")
 def health_check(request: Request, response: Response):
     """

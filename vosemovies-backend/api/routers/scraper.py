@@ -39,6 +39,7 @@ async def run_scraper_task():
 
 @router.post("/run")
 @router.get("/run")  # Also support GET for free monitoring services
+@router.head("/run")  # Support HEAD for UptimeRobot monitoring
 async def trigger_scraper(background_tasks: BackgroundTasks, request: Request):
     """
     Trigger the unified scraper to update showtime data
